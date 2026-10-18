@@ -284,23 +284,82 @@
     }
 
     /* ==========================================================================
-       PINTEREST-STYLE MASONRY FEED & TACTILE PAPER POSTERS
+       CHRONOLOGICAL DAY SECTIONS & BENTO GRID (Guaranteed Minimum Spacing)
        ========================================================================== */
-    .events-masonry {
-      column-count: 2;
-      column-gap: 1.25rem;
-      width: 100%;
+    .day-section {
+      margin-bottom: 2.25rem;
+    }
+
+    .day-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.95rem;
+      padding: 0.35rem 0.55rem;
+      border-bottom: 1.5px dashed var(--border-paper);
+      cursor: pointer;
+      user-select: none;
+      transition: border-color 0.15s ease, background-color 0.15s ease;
+      border-radius: 2px;
+    }
+
+    .day-header:hover {
+      border-bottom-color: var(--ink-secondary);
+      background: rgba(255, 255, 255, 0.45);
+    }
+
+    .day-stamp {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-family: var(--font-display);
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: var(--ink-primary);
+    }
+
+    .day-count {
+      font-family: var(--font-display);
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--ink-muted);
+      background: rgba(255, 255, 255, 0.7);
+      padding: 0.15rem 0.55rem;
+      border-radius: 12px;
+      border: 1px solid rgba(40, 35, 30, 0.08);
+    }
+
+    /* Bento Day Grid: Strictly prevents collisions & guaranteed min gap */
+    .day-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.35rem; /* Guaranteed minimum distance between all flyers — NO touching */
+      align-items: start;
+    }
+
+    /* If a day has only 1 event, let it span full width so it fills the row harmoniously */
+    .day-grid.single-item .poster-card {
+      grid-column: 1 / -1;
     }
 
     @media (max-width: 680px) {
-      .events-masonry {
-        column-count: 1;
+      .day-grid {
+        grid-template-columns: 1fr;
+        gap: 1.15rem;
+      }
+      .day-section {
+        margin-bottom: 1.75rem;
+      }
+      .day-header {
+        margin-bottom: 0.75rem;
       }
     }
 
     /* The Poster Flyer Card: Tactile paper texture with screenprint grain & organic washi tape */
     .poster-card {
-      break-inside: avoid;
       display: block;
       background-color: var(--card-bg-tint, var(--bg-card));
       border: 1px solid var(--card-border-tint, rgba(40, 35, 30, 0.09));
@@ -337,21 +396,11 @@
       clip-path: polygon(0 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%);
     }
 
-    /* Organic, Staggered Placement Rhythm (Eliminates cookie-cutter uniformity) */
-    .poster-card:nth-child(2n) {
-      margin-left: 5px;
-      margin-right: -3px;
-      margin-bottom: 1.65rem;
-      transform: translateY(4px);
-    }
-    .poster-card:nth-child(2n+1) {
-      margin-left: -3px;
-      margin-right: 5px;
-      margin-bottom: 1.3rem;
-    }
-    .poster-card:nth-child(3n) {
-      margin-bottom: 1.85rem;
-    }
+    /* Subtle Handmade Micro-Rotations (Zero collision risk with 1.35rem grid gap) */
+    .poster-card:nth-child(4n+1) { transform: rotate(-0.6deg); }
+    .poster-card:nth-child(4n+2) { transform: rotate(0.7deg); }
+    .poster-card:nth-child(4n+3) { transform: rotate(-0.5deg); }
+    .poster-card:nth-child(4n+4) { transform: rotate(0.6deg); }
 
     /* ==========================================================================
        VARIABLE POSTER FORMATS & WEIGHTING (Google Photos / Editorial Hierarchy)
@@ -359,11 +408,9 @@
 
     /* 1. HERO POSTER: Headline Event Spanning Full Feed Width */
     .poster-card.format-hero {
-      column-span: all;
-      margin-left: 0 !important;
-      margin-right: 0 !important;
+      grid-column: 1 / -1;
       width: 100%;
-      margin-bottom: 2.2rem;
+      transform: none !important;
       padding: 1.35rem 1.45rem 1.25rem;
       box-shadow: 2px 4px 0 rgba(40, 35, 30, 0.08), 0 10px 24px rgba(40, 35, 30, 0.06);
     }
@@ -1316,121 +1363,182 @@
           }
         }
 
+        // Group chronologically by date
+        const eventsByDate = new Map();
         filteredEvents.forEach(event => {
-          const card = document.createElement('a');
-          const format = event.weight || 'standard';
-          card.className = `poster-card cat-${event.category} format-${format}`;
-          card.href = event.link;
-          card.target = '_blank';
-          card.rel = 'noopener';
-          card.dataset.id = event.id;
-          card.dataset.cat = event.category;
-
-          // Apply pre-computed tint if available
-          if (event.tint) {
-            card.style.setProperty('--card-bg-tint', event.tint.bg);
-            card.style.setProperty('--card-border-tint', event.tint.border);
-            card.style.setProperty('--card-pill-bg', event.tint.pillBg);
-            card.style.setProperty('--card-accent-tint', event.tint.ink);
+          if (!eventsByDate.has(event.date)) {
+            eventsByDate.set(event.date, []);
           }
-
-          const shortDate = getShortDateBadge(event.date);
-
-          let cardContent = '';
-
-          if (format === 'hero') {
-            // HERO FORMAT: Spans both columns with panoramic photography & curator stamp
-            cardContent = `
-              <div class="poster-meta-top">
-                <div style="display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap;">
-                  <span class="cat-pill ${event.category}">${getCatLabel(event.category)}</span>
-                  <span class="curator-stamp">${ICONS.star} <span>${event.curatorBadge || 'Top-Empfehlung'} · ${event.curatorScore}% Match</span></span>
-                </div>
-                <span class="date-badge">${ICONS.calendar} <span>${shortDate}</span></span>
-              </div>
-              ${event.image ? `<div class="poster-img-wrap"><img src="${event.image}" alt="${event.title}" class="poster-img" crossorigin="anonymous" loading="lazy"></div>` : ''}
-              <h3 class="poster-title">${event.title}</h3>
-              <div class="poster-venue">
-                <span>${ICONS.pin} <strong>${event.venueName}</strong></span>
-                <span class="neighborhood">· ${event.neighborhood}</span>
-              </div>
-              ${event.curatorNote ? `<div class="curator-note-box">${ICONS.quote}<span>${event.curatorNote}</span></div>` : ''}
-              <p class="poster-summary">${event.summary}</p>
-              <div class="poster-footer">
-                <span class="time-badge">${ICONS.clock} ${event.time}</span>
-                <span class="ticket-badge">${event.ticketInfo || 'Infos vor Ort'} ${ICONS.arrow}</span>
-              </div>
-            `;
-          } else if (format === 'compact') {
-            // COMPACT FORMAT: Split horizontal thumbnail card
-            cardContent = `
-              <div class="poster-meta-top">
-                <span class="cat-pill ${event.category}">${getCatLabel(event.category)}</span>
-                <span class="date-badge">${ICONS.calendar} <span>${shortDate}</span></span>
-              </div>
-              <div class="compact-split">
-                <div class="compact-body">
-                  <h3 class="poster-title">${event.title}</h3>
-                  <div class="poster-venue">
-                    <span>${ICONS.pin} <strong>${event.venueName}</strong></span>
-                  </div>
-                  <p class="poster-summary">${event.summary}</p>
-                </div>
-                ${event.image ? `<div class="compact-thumb"><img src="${event.image}" alt="${event.title}" class="poster-img" crossorigin="anonymous" loading="lazy"></div>` : ''}
-              </div>
-              <div class="poster-footer">
-                <span class="time-badge">${ICONS.clock} ${event.time}</span>
-                <span class="ticket-badge">${event.ticketInfo || 'Infos vor Ort'} ${ICONS.arrow}</span>
-              </div>
-            `;
-          } else {
-            // TALL & STANDARD FORMATS
-            const badgeHtml = event.curatorScore && event.curatorScore >= 90
-              ? `<span class="match-badge">${ICONS.star} ${event.curatorScore}% Match</span>`
-              : '';
-
-            cardContent = `
-              <div class="poster-meta-top">
-                <div style="display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap;">
-                  <span class="cat-pill ${event.category}">${getCatLabel(event.category)}</span>
-                  ${badgeHtml}
-                </div>
-                <span class="date-badge">${ICONS.calendar} <span>${shortDate}</span></span>
-              </div>
-              ${event.image ? `<div class="poster-img-wrap"><img src="${event.image}" alt="${event.title}" class="poster-img" crossorigin="anonymous" loading="lazy"></div>` : ''}
-              <h3 class="poster-title">${event.title}</h3>
-              <div class="poster-venue">
-                <span>${ICONS.pin} <strong>${event.venueName}</strong></span>
-                <span class="neighborhood">· ${event.neighborhood}</span>
-              </div>
-              <p class="poster-summary">${event.summary}</p>
-              <div class="poster-footer">
-                <span class="time-badge">${ICONS.clock} ${event.time}</span>
-                <span class="ticket-badge">${event.ticketInfo || 'Infos vor Ort'} ${ICONS.arrow}</span>
-              </div>
-            `;
-          }
-
-          card.innerHTML = cardContent;
-
-          // Dynamically sample image colors once loaded
-          const imgEl = card.querySelector('.poster-img');
-          if (imgEl) {
-            adaptPosterColorFromImage(imgEl, card);
-          }
-
-          // Hover Sync (Poster -> Map)
-          card.addEventListener('mouseenter', () => {
-            focusEventPin(event.id);
-          });
-          card.addEventListener('mouseleave', () => {
-            unfocusEventPin(event.id);
-          });
-
-          masonry.appendChild(card);
+          eventsByDate.get(event.date).push(event);
         });
 
-        eventsContainerEl.appendChild(masonry);
+        // Render each Day Section in chronological order
+        eventsByDate.forEach((dayEvents, dateStr) => {
+          const firstEvt = dayEvents[0];
+          const daySection = document.createElement('section');
+          daySection.className = 'day-section';
+          daySection.dataset.date = dateStr;
+
+          // Day Header with tactile date stamp
+          const dayHeader = document.createElement('div');
+          dayHeader.className = 'day-header';
+          dayHeader.dataset.date = dateStr;
+          dayHeader.title = 'Überfahren, um Termine dieses Tages im Stadtplan hervorzuheben';
+
+          const countLabel = dayEvents.length === 1 ? '1 Aushang' : `${dayEvents.length} Aushänge`;
+
+          dayHeader.innerHTML = `
+            <div class="day-stamp">
+              ${ICONS.calendar}
+              <span>${firstEvt.dateFormatted}</span>
+            </div>
+            <span class="day-count">${countLabel}</span>
+          `;
+
+          // Bidirectional Map Sync on Day Header Hover
+          dayHeader.addEventListener('mouseenter', () => {
+            focusDatePins(dateStr, dayEvents);
+            dayHeader.classList.add('is-highlighted');
+          });
+          dayHeader.addEventListener('mouseleave', () => {
+            unfocusDatePins(dateStr);
+            dayHeader.classList.remove('is-highlighted');
+          });
+
+          // Click Day Header -> Fit map view to events of that day
+          dayHeader.addEventListener('click', () => {
+            const coords = dayEvents.map(e => e.coordinates).filter(c => c && c.length === 2);
+            if (coords.length === 1) {
+              map.panTo(coords[0], { animate: true, duration: 0.5 });
+            } else if (coords.length > 1) {
+              const bounds = L.latLngBounds(coords);
+              map.fitBounds(bounds, { padding: [50, 50], maxZoom: 14, animate: true });
+            }
+          });
+
+          daySection.appendChild(dayHeader);
+
+          // Bento Day Grid: guaranteed minimum gap, no overlapping or collisions
+          const grid = document.createElement('div');
+          grid.className = `day-grid ${dayEvents.length === 1 ? 'single-item' : ''}`;
+
+          dayEvents.forEach(event => {
+            const card = document.createElement('a');
+            const format = event.weight || 'standard';
+            card.className = `poster-card cat-${event.category} format-${format}`;
+            card.href = event.link;
+            card.target = '_blank';
+            card.rel = 'noopener';
+            card.dataset.id = event.id;
+            card.dataset.cat = event.category;
+
+            // Apply pre-computed tint if available
+            if (event.tint) {
+              card.style.setProperty('--card-bg-tint', event.tint.bg);
+              card.style.setProperty('--card-border-tint', event.tint.border);
+              card.style.setProperty('--card-pill-bg', event.tint.pillBg);
+              card.style.setProperty('--card-accent-tint', event.tint.ink);
+            }
+
+            const shortDate = getShortDateBadge(event.date);
+
+            let cardContent = '';
+
+            if (format === 'hero') {
+              // HERO FORMAT: Spans full row with panoramic photo & curator quote
+              cardContent = `
+                <div class="poster-meta-top">
+                  <div style="display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap;">
+                    <span class="cat-pill ${event.category}">${getCatLabel(event.category)}</span>
+                    <span class="curator-stamp">${ICONS.star} <span>${event.curatorBadge || 'Top-Empfehlung'} · ${event.curatorScore}% Match</span></span>
+                  </div>
+                  <span class="date-badge">${ICONS.calendar} <span>${shortDate}</span></span>
+                </div>
+                ${event.image ? `<div class="poster-img-wrap"><img src="${event.image}" alt="${event.title}" class="poster-img" crossorigin="anonymous" loading="lazy"></div>` : ''}
+                <h3 class="poster-title">${event.title}</h3>
+                <div class="poster-venue">
+                  <span>${ICONS.pin} <strong>${event.venueName}</strong></span>
+                  <span class="neighborhood">· ${event.neighborhood}</span>
+                </div>
+                ${event.curatorNote ? `<div class="curator-note-box">${ICONS.quote}<span>${event.curatorNote}</span></div>` : ''}
+                <p class="poster-summary">${event.summary}</p>
+                <div class="poster-footer">
+                  <span class="time-badge">${ICONS.clock} ${event.time}</span>
+                  <span class="ticket-badge">${event.ticketInfo || 'Infos vor Ort'} ${ICONS.arrow}</span>
+                </div>
+              `;
+            } else if (format === 'compact') {
+              // COMPACT FORMAT: Split horizontal thumbnail card
+              cardContent = `
+                <div class="poster-meta-top">
+                  <span class="cat-pill ${event.category}">${getCatLabel(event.category)}</span>
+                  <span class="date-badge">${ICONS.calendar} <span>${shortDate}</span></span>
+                </div>
+                <div class="compact-split">
+                  <div class="compact-body">
+                    <h3 class="poster-title">${event.title}</h3>
+                    <div class="poster-venue">
+                      <span>${ICONS.pin} <strong>${event.venueName}</strong></span>
+                    </div>
+                    <p class="poster-summary">${event.summary}</p>
+                  </div>
+                  ${event.image ? `<div class="compact-thumb"><img src="${event.image}" alt="${event.title}" class="poster-img" crossorigin="anonymous" loading="lazy"></div>` : ''}
+                </div>
+                <div class="poster-footer">
+                  <span class="time-badge">${ICONS.clock} ${event.time}</span>
+                  <span class="ticket-badge">${event.ticketInfo || 'Infos vor Ort'} ${ICONS.arrow}</span>
+                </div>
+              `;
+            } else {
+              // TALL & STANDARD FORMATS
+              const badgeHtml = event.curatorScore && event.curatorScore >= 90
+                ? `<span class="match-badge">${ICONS.star} ${event.curatorScore}% Match</span>`
+                : '';
+
+              cardContent = `
+                <div class="poster-meta-top">
+                  <div style="display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap;">
+                    <span class="cat-pill ${event.category}">${getCatLabel(event.category)}</span>
+                    ${badgeHtml}
+                  </div>
+                  <span class="date-badge">${ICONS.calendar} <span>${shortDate}</span></span>
+                </div>
+                ${event.image ? `<div class="poster-img-wrap"><img src="${event.image}" alt="${event.title}" class="poster-img" crossorigin="anonymous" loading="lazy"></div>` : ''}
+                <h3 class="poster-title">${event.title}</h3>
+                <div class="poster-venue">
+                  <span>${ICONS.pin} <strong>${event.venueName}</strong></span>
+                  <span class="neighborhood">· ${event.neighborhood}</span>
+                </div>
+                <p class="poster-summary">${event.summary}</p>
+                <div class="poster-footer">
+                  <span class="time-badge">${ICONS.clock} ${event.time}</span>
+                  <span class="ticket-badge">${event.ticketInfo || 'Infos vor Ort'} ${ICONS.arrow}</span>
+                </div>
+              `;
+            }
+
+            card.innerHTML = cardContent;
+
+            // Dynamically sample image colors once loaded
+            const imgEl = card.querySelector('.poster-img');
+            if (imgEl) {
+              adaptPosterColorFromImage(imgEl, card);
+            }
+
+            // Hover Sync (Poster -> Map)
+            card.addEventListener('mouseenter', () => {
+              focusEventPin(event.id);
+            });
+            card.addEventListener('mouseleave', () => {
+              unfocusEventPin(event.id);
+            });
+
+            grid.appendChild(card);
+          });
+
+          daySection.appendChild(grid);
+          eventsContainerEl.appendChild(daySection);
+        });
       }
 
       // ======================================================================
@@ -1470,6 +1578,44 @@
       }
 
       function unfocusEventPin(eventId) {
+        mapFocusPillEl.classList.remove('visible');
+        markersById.forEach(m => {
+          const el = m.getElement();
+          if (!el) return;
+          const pinDiv = el.querySelector('.litfass-pin');
+          if (pinDiv) {
+            pinDiv.classList.remove('is-highlighted');
+            pinDiv.classList.remove('is-dimmed');
+          }
+        });
+      }
+
+      // Day Header Hover -> Focus all pins of that specific day & update map indicator
+      function focusDatePins(dateStr, dayEvents) {
+        const targetEvt = dayEvents[0];
+        if (!targetEvt) return;
+
+        const countStr = dayEvents.length === 1 ? '1 Aushang' : `${dayEvents.length} Aushänge`;
+        mapFocusPillEl.innerHTML = `<svg class="lit-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:3px;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg><span>${targetEvt.dateFormatted} · ${countStr} im Stadtplan</span>`;
+        mapFocusPillEl.classList.add('visible');
+
+        markersById.forEach((m, id) => {
+          const el = m.getElement();
+          if (!el) return;
+          const pinDiv = el.querySelector('.litfass-pin');
+          if (!pinDiv) return;
+          const isCurrentDay = dayEvents.some(e => e.id === id);
+          if (isCurrentDay) {
+            pinDiv.classList.add('is-highlighted');
+            pinDiv.classList.remove('is-dimmed');
+          } else {
+            pinDiv.classList.add('is-dimmed');
+            pinDiv.classList.remove('is-highlighted');
+          }
+        });
+      }
+
+      function unfocusDatePins(dateStr) {
         mapFocusPillEl.classList.remove('visible');
         markersById.forEach(m => {
           const el = m.getElement();

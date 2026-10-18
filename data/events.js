@@ -13,7 +13,9 @@ window.LITFASS_DATA = {
       11.5754
     ],
     "zoom": 12,
-    "lastPasted": "18. Okt 2026"
+    "lastPasted": "18. Okt 2026",
+    "tileProvider": "osm",
+    "mapboxToken": ""
   },
   "categories": [
     {

@@ -6,13 +6,22 @@
   <title>Litfaß MUC — Unabhängiger Münchner Kultur- & Terminaushang</title>
   <meta name="description" content="Digitaler Litfaßsäulen-Aushang für München: Handverlesene Flohmärkte, Street Food Pop-Ups, Konzerte und Outdoor-Rides. Zero Backend, Community-gepflegt.">
 
+  <!-- Favicon: Digital Litfaß Pillar Icon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231C1A18'/%3E%3Crect x='8' y='6' width='16' height='20' rx='3' fill='%23FAF6EE'/%3E%3Crect x='11' y='9' width='10' height='4' rx='1' fill='%23D95B38'/%3E%3Crect x='11' y='15' width='10' height='2' rx='1' fill='%238B6514'/%3E%3Crect x='11' y='19' width='7' height='2' rx='1' fill='%2328527A'/%3E%3C/svg%3E">
+
+  <!-- OpenGraph & Social Metadata -->
+  <meta property="og:title" content="Litfaß MUC — Unabhängiger Münchner Kultur- & Terminaushang">
+  <meta property="og:description" content="Handverlesene Flohmärkte, Street Food Pop-Ups, Konzerte und Outdoor-Rides. Zero Backend, Community-gepflegt.">
+  <meta property="og:type" content="website">
+  <meta name="theme-color" content="#EDE6DC">
+
   <!-- Typography: Space Grotesk (Headers) + Plus Jakarta Sans (Body & Meta) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
 
   <!-- Leaflet CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
   <style>
     /* ==========================================================================
@@ -839,6 +848,11 @@
     .litfass-pin.cat-concert { background: var(--cat-concert); }
     .litfass-pin.cat-sport { background: var(--cat-sport); }
 
+    /* Tactile Paper Map Tile Styling */
+    .leaflet-tile-pane {
+      filter: sepia(0.08) contrast(0.96) brightness(1.02);
+    }
+
     /* Map Pin Sync States */
     .litfass-pin.is-dimmed {
       opacity: 0.22;
@@ -1052,8 +1066,8 @@
 
   </div>
 
-  <!-- External Leaflet JS -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <!-- External Leaflet JS (No strict SRI to ensure resilient CDN delivery) -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <!-- Autonomous Event Data (Option B: Separated Data File) -->
   <script src="data/events.js"></script>
@@ -1123,7 +1137,6 @@
       }
 
       // 3. Leaflet Map Initialization
-      // Using CartoDB Voyager tiles (warm, subtle paper tone, clean vector labels)
       const map = L.map('city-map', {
         center: pillar.center || [48.1371, 11.5754],
         zoom: pillar.zoom || 12,
@@ -1131,11 +1144,61 @@
         scrollWheelZoom: true
       });
 
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
-        subdomains: 'abcd',
-        maxZoom: 19
+      // Flexible Tile Provider Selection with Fallback
+      // Supports OpenStreetMap (default, zero key required), CartoDB Voyager, or Mapbox token
+      let tileUrl = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+      let tileAttribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> Mitwirkende';
+      let maxTileZoom = 19;
+      let tileSubdomains = 'abc';
+
+      if (pillar.mapboxToken && typeof pillar.mapboxToken === 'string' && pillar.mapboxToken.trim().length > 0) {
+        tileUrl = `https://api.mapbox.com/styles/v1/mapbox/light-v11/tiles/{z}/{x}/{y}?access_token=${pillar.mapboxToken.trim()}`;
+        tileAttribution = '&copy; <a href="https://www.mapbox.com/about/maps/">Mapbox</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
+        maxTileZoom = 20;
+      } else if (pillar.tileProvider === 'carto') {
+        tileUrl = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+        tileAttribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>';
+        tileSubdomains = 'abcd';
+      }
+
+      const mainTileLayer = L.tileLayer(tileUrl, {
+        attribution: tileAttribution,
+        subdomains: tileSubdomains,
+        maxZoom: maxTileZoom
       }).addTo(map);
+
+      // Tile error fallback: if Mapbox or Carto fails, gracefully switch to standard OSM
+      mainTileLayer.on('tileerror', function() {
+        if (tileUrl !== 'https://tile.openstreetmap.org/{z}/{x}/{y}.png') {
+          console.warn('Litfaß: Tile provider failed or blocked, falling back to standard OpenStreetMap.');
+          map.removeLayer(mainTileLayer);
+          L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+            maxZoom: 19
+          }).addTo(map);
+        }
+      });
+
+      // Ensure Leaflet calculates dimensions reliably after flex layout / font loading
+      function triggerMapResize() {
+        if (map) {
+          map.invalidateSize();
+        }
+      }
+
+      setTimeout(triggerMapResize, 100);
+      setTimeout(triggerMapResize, 350);
+      setTimeout(triggerMapResize, 1000);
+      window.addEventListener('resize', triggerMapResize);
+      window.addEventListener('load', triggerMapResize);
+
+      if (window.ResizeObserver) {
+        const mapEl = document.getElementById('city-map');
+        if (mapEl) {
+          const ro = new ResizeObserver(() => triggerMapResize());
+          ro.observe(mapEl);
+        }
+      }
 
       // Marker Registry for Hover/Click Synchronization
       const markersById = new Map();

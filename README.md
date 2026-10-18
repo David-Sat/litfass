@@ -51,18 +51,31 @@ This repository is built as an open **GitHub Template Repository** that anyone c
 
 ### 2. Enable GitHub Pages
 1. Go to your repository settings on GitHub: **Settings** > **Pages**.
-2. Under **Build and deployment** > **Source**, select **Deploy from a branch**.
-3. Choose branch: `main` and folder: `/ (root)`. Click **Save**.
-4. Your site will be live at `https://YOUR_USERNAME.github.io/litfass-YOUR_CITY/` in ~60 seconds.
+2. Under **Build and deployment** > **Source**, select **GitHub Actions**.
+3. That's it! Every push to `main` automatically triggers the lightweight `.github/workflows/deploy.yml` action, running a quick syntax sanity check on your event data and deploying instantly.
+4. Your site will be live at `https://YOUR_USERNAME.github.io/litfass/`.
 
-### 3. Customize `PILLAR.md` for Your City
+### 3. Map Configuration (Zero-Key by Default or Mapbox)
+Litfaß comes with **OpenStreetMap** enabled by default—it works immediately with **zero API keys** and zero configuration.
+
+If you prefer custom Mapbox styles, simply add your public token to `data/events.js`:
+```javascript
+"pillar": {
+  "name": "Litfaß MUC",
+  "tileProvider": "osm",      // "osm" (default OpenStreetMap), "carto" (CartoDB), or "mapbox"
+  "mapboxToken": "pk.ey..."   // Optional: paste your Mapbox public token here
+}
+```
+If a custom tile provider or key fails, Litfaß automatically falls back to OpenStreetMap so the map never appears blank.
+
+### 4. Customize `PILLAR.md` for Your City
 Open `PILLAR.md` and edit:
 * **City Name & Pillar Title:** (e.g., `Litfaß BER` / Berlin)
 * **Map Center & Bounding Box:** Get target coordinates for your city center.
 * **The "YES" and "NO" Lists:** Customize local genres, favorite neighborhood flea markets, indie venues, and community groups.
 * **Local Sources:** List 4–6 high-signal local blogs, magazine event calendars, or cultural hubs.
 
-### 4. Schedule Weekly Updates with Your AI Agent
+### 5. Schedule Weekly Updates with Your AI Agent
 
 #### Via Google Antigravity:
 Run the `/schedule` command or prompt Antigravity:

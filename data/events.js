@@ -26,25 +26,25 @@ window.LITFASS_DATA = {
     },
     {
       "id": "flea_market",
-      "name": "Vintage & Stöbern",
+      "name": "Märkte & Vintage",
       "color": "#8B6514",
-      "label": "Vintage"
+      "label": "Märkte"
     },
     {
       "id": "food",
-      "name": "Food & Gemütlich",
+      "name": "Food & Pop-Ups",
       "color": "#A84225",
-      "label": "Gemütlich"
+      "label": "Genuss"
     },
     {
       "id": "concert",
-      "name": "Konzerte & Live",
+      "name": "Kultur & Open-Air",
       "color": "#28527A",
-      "label": "Live"
+      "label": "Kultur"
     },
     {
       "id": "sport",
-      "name": "Sport & Draußen",
+      "name": "Sport & Bewegung",
       "color": "#386641",
       "label": "Aktiv"
     }
@@ -184,15 +184,44 @@ window.LITFASS_DATA = {
       "link": "https://www.komoot.de/tour/muenchen-isar-gravel-autumn",
       "ticketInfo": "Freie Teilnahme (Gravel / Allroad)",
       "image": "https://images.unsplash.com/photo-1485965120184-e220f721d03e?auto=format&fit=crop&w=700&q=80",
-      "weight": "hero",
-      "curatorScore": 96,
+      "weight": "tall",
+      "curatorScore": 92,
       "curatorBadge": "Outdoor-Highlight",
-      "curatorNote": "Entspricht deinem Wunsch nach Social Rides: 65km Isarschotter im goldenen Herbstlaub ohne Renndruck.",
+      "curatorNote": "Entspannte Schotter-Ausfahrt: 65km Isarschotter im goldenen Herbstlaub ohne Renndruck.",
       "tint": {
         "bg": "#F1F6F2",
         "border": "rgba(51, 102, 62, 0.15)",
         "pillBg": "#DAE9DC",
         "ink": "#1E4726"
+      }
+    },
+    {
+      "id": "muc-20261024-demo-demokratie",
+      "title": "Großkundgebung für Demokratie & Vielfalt: Open-Air am Königsplatz",
+      "category": "concert",
+      "date": "2026-10-24",
+      "dateFormatted": "Samstag, 24. Oktober 2026",
+      "time": "15:00 – 18:00 Uhr",
+      "venueName": "Königsplatz",
+      "neighborhood": "Maxvorstadt",
+      "address": "Königsplatz 1, 80333 München",
+      "coordinates": [
+        48.1463,
+        11.5646
+      ],
+      "summary": "Breites zivilgesellschaftliches Bündnis aus Kultur, Nachbarschaft und Vereinen für eine offene, lebendige Stadtgesellschaft. Mit kurzen Redebeiträgen und Live-Akustikmusik vor den klassizistischen Propyläen.",
+      "link": "https://muenchen-fuer-demokratie.de/termine/kundgebung-koenigsplatz/",
+      "ticketInfo": "Freie Teilnahme / Öffentlich",
+      "image": "https://images.unsplash.com/photo-1569098644584-210bcd375b59?auto=format&fit=crop&w=700&q=80",
+      "weight": "hero",
+      "curatorScore": 97,
+      "curatorBadge": "Zivilgesellschaft",
+      "curatorNote": "Standout-Manifestation: Zivilgesellschaftliches Zusammenkommen auf dem Königsplatz für eine offene Stadt.",
+      "tint": {
+        "bg": "#F4F7FC",
+        "border": "rgba(40, 82, 122, 0.16)",
+        "pillBg": "#DFE8F5",
+        "ink": "#1B3B59"
       }
     },
     {
@@ -211,9 +240,9 @@ window.LITFASS_DATA = {
       ],
       "summary": "Elektrisierende Bağlama-Sounds treffen auf vintage Orgeltöne und moderne Beats. Das Kulturzentrum im Kreativquartier feiert anatolischen Folk in zeitgenössischem Gewand.",
       "link": "https://import-export.cc/event/derya-yildirim-grup-simsek-live/",
-      "ticketInfo": "VVK 22 €",
-      "weight": "tall",
-      "curatorScore": 93,
+      "ticketInfo": "Abendkasse 22 €",
+      "weight": "standard",
+      "curatorScore": 88,
       "curatorBadge": "Live-Tipp",
       "curatorNote": "Analoger anatolisch-psychedelischer Folk im intimen Import Export Saal.",
       "tint": {
@@ -221,6 +250,64 @@ window.LITFASS_DATA = {
         "border": "rgba(163, 62, 89, 0.15)",
         "pillBg": "#F3D8DF",
         "ink": "#5C1A2D"
+      }
+    },
+    {
+      "id": "muc-20261025-auer-dult",
+      "title": "Auer Kirchweihdult: Tandler, Trödel & Schmalzgebäck",
+      "category": "flea_market",
+      "date": "2026-10-25",
+      "dateFormatted": "Sonntag, 25. Oktober 2026",
+      "time": "10:00 – 19:00 Uhr",
+      "venueName": "Mariahilfplatz",
+      "neighborhood": "Au",
+      "address": "Mariahilfplatz 1, 81541 München",
+      "coordinates": [
+        48.1242,
+        11.5812
+      ],
+      "summary": "Der traditionsreichste Herbstmarkt Münchens: Zwischen historischen Geschirrständen, Tandler-Gassen, Kettenkarussell, gedämpften Knödeln und Steckerlfisch das gemächliche Viertelleben genießen.",
+      "link": "https://www.auerdult.de/kirchweihdult/",
+      "ticketInfo": "Freier Eintritt",
+      "image": "https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?auto=format&fit=crop&w=700&q=80",
+      "weight": "hero",
+      "curatorScore": 99,
+      "curatorBadge": "Münchner Jahreshighlight",
+      "curatorNote": "Standout-Event: Nur einmal im Herbst! Geschirr, Antiquitäten, Schmalzgebäck & Kettenkarussell rund um die Mariahilfkirche.",
+      "tint": {
+        "bg": "#FAF5EA",
+        "border": "rgba(139, 101, 20, 0.18)",
+        "pillBg": "#EDE3C7",
+        "ink": "#4F380A"
+      }
+    },
+    {
+      "id": "muc-20261025-pinakothek",
+      "title": "Museumssonntag: Die Neue Sammlung & Design-Labor",
+      "category": "concert",
+      "date": "2026-10-25",
+      "dateFormatted": "Sonntag, 25. Oktober 2026",
+      "time": "10:00 – 18:00 Uhr",
+      "venueName": "Pinakothek der Moderne",
+      "neighborhood": "Maxvorstadt",
+      "address": "Barer Straße 40, 80333 München",
+      "coordinates": [
+        48.1472,
+        11.5722
+      ],
+      "summary": "Sonntags durch die lichten Hallen des Kunstareals schlendern: Neu aufgestellte Exponate zu internationalem Industriedesign, Prototypen und moderner Architektur für nur 1 Euro Eintritt.",
+      "link": "https://www.pinakothek-der-moderne.de/ausstellungen/die-neue-sammlung/",
+      "ticketInfo": "1 € Museumssonntag",
+      "image": "https://images.unsplash.com/photo-1544531585-9847b68c8c86?auto=format&fit=crop&w=700&q=80",
+      "weight": "tall",
+      "curatorScore": 94,
+      "curatorBadge": "Kultur-Tipp",
+      "curatorNote": "Perfekt für 1–2 Stunden Kulturinspiration im Kunstareal zum legendären 1-Euro-Sonntagstarif.",
+      "tint": {
+        "bg": "#F2F4F7",
+        "border": "rgba(45, 65, 95, 0.15)",
+        "pillBg": "#DDE3ED",
+        "ink": "#1A2E4B"
       }
     },
     {
@@ -240,10 +327,10 @@ window.LITFASS_DATA = {
       "summary": "Der traditionsreichste Freigelände-Markt der Stadt mit großer Antikhalle. Von rustikalen Holzmöbeln bis zu kuriosen Schätzen aus sechs Jahrzehnten.",
       "link": "https://www.flohmarkt-daglfing.de/antike-troedelmarkt-sonntag/",
       "ticketInfo": "Eintritt frei",
-      "weight": "standard",
-      "curatorScore": 88,
+      "weight": "compact",
+      "curatorScore": 79,
       "curatorBadge": "Trödel-Klassiker",
-      "curatorNote": "Großer Antik- & Freigelände-Flohmarkt für echte Schnäppchenjäger.",
+      "curatorNote": "Wöchentlicher Flohmarkt-Klassiker auf dem Rennbahn-Freigelände.",
       "tint": {
         "bg": "#F9F5EC",
         "border": "rgba(138, 112, 45, 0.15)",
